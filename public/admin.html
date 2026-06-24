@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriSnap Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.35.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F1F5F9;color:#1a1a1a;min-height:100vh}
+
+/* LOGIN */
+#login-page{position:fixed;inset:0;background:linear-gradient(135deg,#0E9F6E,#057A55);display:flex;align-items:center;justify-content:center;z-index:999}
+.login-card{background:#fff;border-radius:20px;padding:40px 36px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.2)}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.login-logo-icon{width:42px;height:42px;background:#0E9F6E;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px}
+.login-logo-name{font-size:20px;font-weight:700}
+.login-badge{font-size:10px;background:#FEF3C7;color:#92400E;padding:2px 9px;border-radius:99px;font-weight:700;border:1px solid #FDE68A;margin-left:4px}
+.login-title{font-size:24px;font-weight:700;margin-bottom:4px}
+.login-sub{font-size:13px;color:#6c757d;margin-bottom:24px}
+.login-field{margin-bottom:14px}
+.login-field label{font-size:12px;font-weight:600;color:#495057;display:block;margin-bottom:5px}
+.login-field input{width:100%;border:1.5px solid #dee2e6;border-radius:9px;padding:11px 14px;font-size:14px;outline:none;font-family:inherit;transition:.15s}
+.login-field input:focus{border-color:#0E9F6E;box-shadow:0 0 0 3px rgba(14,159,110,.12)}
+.login-btn{width:100%;background:#0E9F6E;color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s;margin-top:4px}
+.login-btn:hover{background:#057A55}
+.login-error{background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:8px 12px;font-size:13px;color:#dc2626;margin-bottom:14px;display:none}
+.login-hint{font-size:11px;color:#adb5bd;text-align:center;margin-top:14px}
+
+/* LAYOUT */
+#app{display:none;min-height:100vh}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:240px;background:#0E9F6E;display:flex;flex-direction:column;z-index:10}
+.sidebar-logo{padding:20px;border-bottom:1px solid rgba(255,255,255,.15);display:flex;align-items:center;gap:10px}
+.sidebar-logo-icon{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
+.sidebar-logo-text .name{font-size:15px;font-weight:700;color:#fff}
+.sidebar-logo-text .badge{font-size:9px;background:rgba(255,255,255,.25);color:#fff;padding:2px 7px;border-radius:99px;font-weight:700}
+.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto}
+.nav-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase;padding:10px 12px 4px}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;font-size:13px;font-weight:500;color:rgba(255,255,255,.8);cursor:pointer;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;font-family:inherit;transition:.15s}
+.nav-btn:hover{background:rgba(255,255,255,.15);color:#fff}
+.nav-btn.active{background:rgba(255,255,255,.2);color:#fff;font-weight:600}
+.nav-btn i{font-size:17px;flex-shrink:0}
+.sidebar-footer{padding:12px 10px;border-top:1px solid rgba(255,255,255,.15)}
+.sidebar-user{display:flex;align-items:center;gap:9px;padding:8px 10px;background:rgba(255,255,255,.1);border-radius:9px}
+.sidebar-avatar{width:30px;height:30px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#0E9F6E;flex-shrink:0}
+.sidebar-username{font-size:12px;font-weight:600;color:#fff}
+.sidebar-role{font-size:10px;color:rgba(255,255,255,.6)}
+.logout-btn{margin-left:auto;background:none;border:none;color:rgba(255,255,255,.6);cursor:pointer;font-size:16px;padding:4px}
+.logout-btn:hover{color:#fff}
+
+.main{margin-left:240px;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:#fff;border-bottom:1px solid #e9ecef;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+.topbar-title{font-size:18px;font-weight:700}
+.topbar-sub{font-size:12px;color:#6c757d;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.refresh-btn{background:#F1F5F9;border:1px solid #e9ecef;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:#495057;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;transition:.15s}
+.refresh-btn:hover{background:#e9ecef}
+.content{padding:24px 28px;flex:1}
+
+/* STAT CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:#fff;border-radius:14px;padding:20px;border:1px solid #e9ecef}
+.stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
+.stat-icon.green{background:#DEF7EC;color:#0E9F6E}
+.stat-icon.blue{background:#DBEAFE;color:#3B82F6}
+.stat-icon.purple{background:#EDE9FE;color:#8B5CF6}
+.stat-icon.orange{background:#FEF3C7;color:#D97706}
+.stat-num{font-size:30px;font-weight:700;color:#1a1a1a;line-height:1}
+.stat-label{font-size:12px;color:#6c757d;margin-top:4px}
+.stat-change{font-size:11px;font-weight:600;margin-top:8px;color:#0E9F6E;display:flex;align-items:center;gap:3px}
+
+/* CHART CARD */
+.card{background:#fff;border-radius:14px;border:1px solid #e9ecef;overflow:hidden;margin-bottom:24px}
+.card-header{padding:16px 20px;border-bottom:1px solid #e9ecef;display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:14px;font-weight:700}
+.card-sub{font-size:11px;color:#6c757d;margin-top:2px}
+.card-body{padding:20px}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:120px}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:5px 5px 0 0;background:#0E9F6E;min-height:4px;transition:height .4s}
+.bar:hover{background:#057A55}
+.bar-label{font-size:9px;color:#6c757d}
+.bar-val{font-size:9px;font-weight:700;color:#0E9F6E}
+
+/* TABLE */
+.table-card{background:#fff;border-radius:14px;border:1px solid #e9ecef;overflow:hidden;margin-bottom:24px}
+.toolbar{padding:14px 18px;border-bottom:1px solid #e9ecef;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.search-wrap{display:flex;align-items:center;gap:7px;background:#F8FAFC;border:1px solid #e9ecef;border-radius:8px;padding:7px 12px;flex:1;max-width:280px}
+.search-wrap input{border:none;background:none;outline:none;font-size:13px;width:100%;font-family:inherit}
+.sort-sel{border:1px solid #e9ecef;border-radius:8px;padding:7px 10px;font-size:12px;outline:none;font-family:inherit;cursor:pointer;background:#fff}
+.act-btn{border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;transition:.15s}
+.btn-green{background:#0E9F6E;color:#fff}
+.btn-green:hover{background:#057A55}
+.btn-purple{background:#EDE9FE;color:#5B21B6}
+.btn-purple:hover{background:#DDD6FE}
+.btn-red{background:#fff5f5;color:#dc2626;border:1px solid #fecaca !important}
+table{width:100%;border-collapse:collapse}
+thead tr{background:#F8FAFC}
+th{padding:10px 16px;font-size:10px;font-weight:700;color:#6c757d;text-align:left;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #e9ecef;white-space:nowrap}
+td{padding:12px 16px;font-size:13px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#FAFCFF}
+.u-avatar{width:30px;height:30px;border-radius:50%;background:#DEF7EC;color:#0E9F6E;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
+.badge-green{background:#DEF7EC;color:#065F46}
+.badge-blue{background:#DBEAFE;color:#1E40AF}
+.badge-gray{background:#F1F5F9;color:#475569}
+.empty-state{text-align:center;padding:48px;color:#6c757d}
+.empty-state i{font-size:40px;color:#dee2e6;display:block;margin-bottom:10px}
+.pager{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid #e9ecef;font-size:12px;color:#6c757d}
+.page-btns{display:flex;gap:4px}
+.page-btn{width:28px;height:28px;border-radius:6px;border:1px solid #e9ecef;background:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#495057;font-family:inherit}
+.page-btn.active{background:#0E9F6E;color:#fff;border-color:#0E9F6E}
+
+/* ACTIVITY */
+.activity-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;background:#0E9F6E;flex-shrink:0;margin-top:5px}
+.activity-text{font-size:13px;line-height:1.5}
+.activity-time{font-size:11px;color:#adb5bd;margin-top:2px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#1a1a1a;color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;display:none;align-items:center;gap:8px;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:768px){.sidebar{width:200px}.main{margin-left:200px}.stats-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon"><i class="ti ti-leaf"></i></div>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="login-logo-name">NutriSnap</span>
+          <span class="login-badge">ADMIN</span>
+        </div>
+        <div style="font-size:11px;color:#6c757d">Admin Dashboard</div>
+      </div>
+    </div>
+    <div class="login-title">Welcome back</div>
+    <div class="login-sub">Sign in to manage your users and data</div>
+    <div class="login-error" id="login-err"></div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="adm-user" placeholder="admin" />
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="adm-pass" placeholder="••••••••" />
+    </div>
+    <button class="login-btn" onclick="doLogin()"><i class="ti ti-login"></i> Sign in</button>
+    <div class="login-hint">Default credentials: admin / nutrisnap@2024</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon"><i class="ti ti-leaf"></i></div>
+      <div class="sidebar-logo-text">
+        <div class="name">NutriSnap</div>
+        <span class="badge">ADMIN PANEL</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Main</div>
+      <button class="nav-btn active" onclick="showTab('overview',this)"><i class="ti ti-layout-dashboard"></i> Overview</button>
+      <button class="nav-btn" onclick="showTab('users',this)"><i class="ti ti-users"></i> All Users</button>
+      <button class="nav-btn" onclick="showTab('activity',this)"><i class="ti ti-activity"></i> Activity Log</button>
+      <div class="nav-label" style="margin-top:8px">Tools</div>
+      <button class="nav-btn" onclick="exportCSV()"><i class="ti ti-download"></i> Export CSV</button>
+      <button class="nav-btn" onclick="seedDemo()"><i class="ti ti-database-plus"></i> Add Demo Data</button>
+      <button class="nav-btn" onclick="clearAll()" style="color:rgba(255,100,100,.9)"><i class="ti ti-trash"></i> Clear All Data</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">A</div>
+        <div><div class="sidebar-username">Administrator</div><div class="sidebar-role">Super Admin</div></div>
+        <button class="logout-btn" onclick="doLogout()" title="Logout"><i class="ti ti-logout"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Overview</div>
+        <div class="topbar-sub" id="topbar-sub">Loading data...</div>
+      </div>
+      <div class="topbar-right">
+        <span style="font-size:12px;color:#6c757d" id="last-updated"></span>
+        <button class="refresh-btn" onclick="loadAll()"><i class="ti ti-refresh"></i> Refresh</button>
+        <a href="/" style="background:#DEF7EC;color:#065F46;border:1px solid #6EE7B7;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px"><i class="ti ti-arrow-left"></i> Back to site</a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- OVERVIEW TAB -->
+      <div id="tab-overview">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="ti ti-users"></i></div>
+            <div class="stat-num" id="s-total">0</div>
+            <div class="stat-label">Total Signups</div>
+            <div class="stat-change"><i class="ti ti-trending-up"></i> All time</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon blue"><i class="ti ti-user-plus"></i></div>
+            <div class="stat-num" id="s-today">0</div>
+            <div class="stat-label">Today</div>
+            <div class="stat-change"><i class="ti ti-clock"></i> <span id="s-today-lbl">Today</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple"><i class="ti ti-calendar-week"></i></div>
+            <div class="stat-num" id="s-week">0</div>
+            <div class="stat-label">This Week</div>
+            <div class="stat-change"><i class="ti ti-calendar"></i> Last 7 days</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange"><i class="ti ti-calendar-month"></i></div>
+            <div class="stat-num" id="s-month">0</div>
+            <div class="stat-label">This Month</div>
+            <div class="stat-change"><i class="ti ti-calendar"></i> Last 30 days</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Signups — Last 7 Days</div><div class="card-sub">Daily new registrations</div></div>
+          </div>
+          <div class="card-body"><div class="bar-chart" id="bar-chart"></div></div>
+        </div>
+
+        <div class="table-card">
+          <div class="card-header">
+            <div><div class="card-title">Recent Signups</div><div class="card-sub">Latest 5 users</div></div>
+            <button class="act-btn btn-green" onclick="showTab('users',null)"><i class="ti ti-arrow-right"></i> View all</button>
+          </div>
+          <table><thead><tr><th>#</th><th>User</th><th>Email</th><th>Joined</th><th>Status</th></tr></thead>
+          <tbody id="recent-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- USERS TAB -->
+      <div id="tab-users" style="display:none">
+        <div class="table-card">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <i class="ti ti-search" style="color:#adb5bd;font-size:14px"></i>
+              <input type="text" id="search-inp" placeholder="Search name or email…" oninput="renderUsers()">
+            </div>
+            <select class="sort-sel" id="sort-sel" onchange="renderUsers()">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="name">Name A–Z</option>
+            </select>
+            <button class="act-btn btn-green" onclick="exportCSV()"><i class="ti ti-download"></i> Export CSV</button>
+            <button class="act-btn btn-purple" onclick="seedDemo()"><i class="ti ti-database-plus"></i> Demo Data</button>
+            <button class="act-btn btn-red" onclick="clearAll()"><i class="ti ti-trash"></i> Clear All</button>
+          </div>
+          <table><thead><tr><th>#</th><th>User</th><th>Email</th><th>Joined Date</th><th>Time</th><th>Days Ago</th><th>Action</th></tr></thead>
+          <tbody id="users-tbody"></tbody></table>
+          <div class="pager"><span id="pager-info"></span><div class="page-btns" id="page-btns"></div></div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY TAB -->
+      <div id="tab-activity" style="display:none">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Activity Log</div><div class="card-sub">All signup events</div></div></div>
+          <div class="card-body" id="activity-feed" style="max-height:520px;overflow-y:auto"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-check"></i> <span id="toast-msg"></span></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'nutrisnap@2024';
+const SESSION_KEY = 'ns_admin_logged_in';
+const NS_USERS_KEY = 'nutrisnap_users';   // same localStorage key as main site
+const PAGE_SIZE = 10;
+
+let currentPage = 1;
+let allUsers = [];
+
+// ── LOGIN ────────────────────────────────────────────
+function doLogin() {
+  const u = document.getElementById('adm-user').value.trim();
+  const p = document.getElementById('adm-pass').value;
+  const err = document.getElementById('login-err');
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadAll();
+  } else {
+    err.textContent = 'Incorrect username or password.';
+    err.style.display = 'block';
+  }
+}
+function doLogout() {
+  sessionStorage.removeItem(SESSION_KEY);
+  location.reload();
+}
+document.getElementById('adm-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('adm-user').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// Auto-login if session exists
+if (sessionStorage.getItem(SESSION_KEY)) {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+// ── DATA ─────────────────────────────────────────────
+function getRawUsers() {
+  try { return JSON.parse(localStorage.getItem(NS_USERS_KEY)) || {}; } catch(e) { return {}; }
+}
+function parseUsers() {
+  const raw = getRawUsers();
+  return Object.entries(raw).map(([email, d]) => ({
+    email,
+    name: d.name || 'Unknown',
+    joined: d.joined ? new Date(d.joined) : new Date()
+  }));
+}
+function fmt(d) { return d.toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}); }
+function fmtT(d) { return d.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}); }
+function daysAgo(d) {
+  const diff = Math.floor((Date.now() - d.getTime()) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  return diff + ' days ago';
+}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── LOAD ALL ─────────────────────────────────────────
+function loadAll() {
+  allUsers = parseUsers().sort((a, b) => b.joined - a.joined);
+  const now = new Date();
+  const todayStr = now.toDateString();
+  const weekAgo = new Date(now - 7 * 86400000);
+  const monthAgo = new Date(now - 30 * 86400000);
+
+  document.getElementById('s-total').textContent = allUsers.length;
+  document.getElementById('s-today').textContent = allUsers.filter(u => u.joined.toDateString() === todayStr).length;
+  document.getElementById('s-week').textContent = allUsers.filter(u => u.joined >= weekAgo).length;
+  document.getElementById('s-month').textContent = allUsers.filter(u => u.joined >= monthAgo).length;
+
+  document.getElementById('topbar-sub').textContent =
+    now.toLocaleDateString('en-IN', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+  document.getElementById('last-updated').textContent =
+    'Updated ' + now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+
+  renderBars();
+  renderRecent();
+  renderUsers();
+  renderActivity();
+}
+
+// ── BAR CHART ────────────────────────────────────────
+function renderBars() {
+  const chart = document.getElementById('bar-chart');
+  chart.innerHTML = '';
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    days.push({ lbl: d.toLocaleDateString('en-IN',{weekday:'short'}).slice(0,3), str: d.toDateString() });
+  }
+  const max = Math.max(...days.map(d => allUsers.filter(u => u.joined.toDateString() === d.str).length), 1);
+  days.forEach(d => {
+    const c = allUsers.filter(u => u.joined.toDateString() === d.str).length;
+    const pct = (c / max) * 100;
+    const wrap = document.createElement('div');
+    wrap.className = 'bar-wrap';
+    wrap.innerHTML = `<div class="bar-val">${c}</div><div class="bar" style="height:${Math.max(pct,3)}%"></div><div class="bar-label">${d.lbl}</div>`;
+    chart.appendChild(wrap);
+  });
+}
+
+// ── RECENT TABLE ─────────────────────────────────────
+function renderRecent() {
+  const tbody = document.getElementById('recent-tbody');
+  const list = allUsers.slice(0, 5);
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="ti ti-users"></i><p>No signups yet.<br>Click <strong>Add Demo Data</strong> in the sidebar to test.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map((u, i) => `<tr>
+    <td style="color:#adb5bd">#${i+1}</td>
+    <td><div style="display:flex;align-items:center;gap:8px"><div class="u-avatar">${u.name[0].toUpperCase()}</div><strong>${esc(u.name)}</strong></div></td>
+    <td style="color:#6c757d">${esc(u.email)}</td>
+    <td>${fmt(u.joined)}</td>
+    <td><span class="badge badge-green"><i class="ti ti-check" style="font-size:9px"></i> Active</span></td>
+  </tr>`).join('');
+}
+
+// ── USERS TABLE ──────────────────────────────────────
+function renderUsers() {
+  let users = [...allUsers];
+  const q = (document.getElementById('search-inp').value || '').toLowerCase();
+  if (q) users = users.filter(u => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
+  const sort = document.getElementById('sort-sel').value;
+  if (sort === 'newest') users.sort((a,b) => b.joined - a.joined);
+  else if (sort === 'oldest') users.sort((a,b) => a.joined - b.joined);
+  else users.sort((a,b) => a.name.localeCompare(b.name));
+
+  const total = users.length;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (currentPage > pages) currentPage = pages;
+  const slice = users.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+
+  const tbody = document.getElementById('users-tbody');
+  if (!slice.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="ti ti-users"></i><p>${q ? 'No users match your search.' : 'No signups yet.'}</p></div></td></tr>`;
+  } else {
+    tbody.innerHTML = slice.map((u, i) => {
+      const n = (currentPage-1)*PAGE_SIZE + i + 1;
+      const da = daysAgo(u.joined);
+      const bc = da==='Today' ? 'badge-green' : da==='Yesterday' ? 'badge-blue' : 'badge-gray';
+      return `<tr>
+        <td style="color:#adb5bd">#${n}</td>
+        <td><div style="display:flex;align-items:center;gap:8px"><div class="u-avatar">${u.name[0].toUpperCase()}</div><strong>${esc(u.name)}</strong></div></td>
+        <td style="color:#6c757d;font-size:12px">${esc(u.email)}</td>
+        <td>${fmt(u.joined)}</td>
+        <td style="color:#6c757d;font-size:12px">${fmtT(u.joined)}</td>
+        <td><span class="badge ${bc}">${da}</span></td>
+        <td><button onclick="deleteUser('${esc(u.email)}')" style="background:#fff5f5;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit"><i class="ti ti-trash"></i></button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('pager-info').textContent =
+    `Showing ${Math.min((currentPage-1)*PAGE_SIZE+1,total)}–${Math.min(currentPage*PAGE_SIZE,total)} of ${total} users`;
+  const pb = document.getElementById('page-btns'); pb.innerHTML = '';
+  for (let p = 1; p <= pages; p++) {
+    const btn = document.createElement('button');
+    btn.className = 'page-btn' + (p === currentPage ? ' active' : '');
+    btn.textContent = p;
+    btn.onclick = () => { currentPage = p; renderUsers(); };
+    pb.appendChild(btn);
+  }
+}
+
+// ── ACTIVITY ─────────────────────────────────────────
+function renderActivity() {
+  const feed = document.getElementById('activity-feed');
+  if (!allUsers.length) {
+    feed.innerHTML = '<div class="empty-state"><i class="ti ti-activity"></i><p>No activity yet.</p></div>';
+    return;
+  }
+  feed.innerHTML = [...allUsers].sort((a,b) => b.joined - a.joined).map(u => `
+    <div class="activity-item">
+      <div class="activity-dot"></div>
+      <div>
+        <div class="activity-text"><strong>${esc(u.name)}</strong> <span style="color:#6c757d">(${esc(u.email)})</span> signed up</div>
+        <div class="activity-time"><i class="ti ti-clock" style="font-size:10px"></i> ${fmt(u.joined)} at ${fmtT(u.joined)} · ${daysAgo(u.joined)}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── TABS ─────────────────────────────────────────────
+function showTab(name, el) {
+  ['overview','users','activity'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else {
+    const idx = ['overview','users','activity'].indexOf(name);
+    document.querySelectorAll('.nav-btn')[idx]?.classList.add('active');
+  }
+  const titles = {overview:'Overview', users:'All Users', activity:'Activity Log'};
+  document.getElementById('topbar-title').textContent = titles[name] || name;
+  if (name === 'users') renderUsers();
+  if (name === 'activity') renderActivity();
+}
+
+// ── ACTIONS ──────────────────────────────────────────
+function deleteUser(email) {
+  if (!confirm(`Remove user "${email}"?`)) return;
+  const raw = getRawUsers(); delete raw[email];
+  localStorage.setItem(NS_USERS_KEY, JSON.stringify(raw));
+  loadAll();
+  toast('User removed');
+}
+
+function exportCSV() {
+  if (!allUsers.length) { toast('No data to export'); return; }
+  const rows = [['#','Name','Email','Joined Date','Joined Time','Days Ago']];
+  allUsers.forEach((u,i) => rows.push([i+1, u.name, u.email, fmt(u.joined), fmtT(u.joined), daysAgo(u.joined)]));
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+  a.download = 'nutrisnap_users_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('CSV exported!');
+}
+
+function seedDemo() {
+  const names = ['Priya Sharma','Rahul Verma','Anita Singh','Karan Mehta','Sneha Patel','Arjun Nair','Kavya Reddy','Rohan Gupta','Deepa Iyer','Vikram Joshi','Meera Das','Amit Kumar'];
+  const raw = getRawUsers(); const now = Date.now();
+  names.forEach(name => {
+    const email = name.toLowerCase().replace(/\s+/g,'.') + '.' + Math.floor(Math.random()*99) + '@gmail.com';
+    if (!raw[email]) {
+      const j = new Date(now - Math.floor(Math.random()*30)*86400000 - Math.random()*86400000);
+      raw[email] = { name, password:'demo', joined: j.toISOString() };
+    }
+  });
+  localStorage.setItem(NS_USERS_KEY, JSON.stringify(raw));
+  loadAll();
+  toast('Demo users added!');
+}
+
+function clearAll() {
+  if (!confirm('⚠️ Delete ALL user accounts permanently?')) return;
+  if (!confirm('Last chance — this cannot be undone!')) return;
+  localStorage.removeItem(NS_USERS_KEY);
+  loadAll();
+  toast('All data cleared');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.style.display = 'flex';
+  setTimeout(() => t.style.display = 'none', 2800);
+}
+
+// ── INIT ─────────────────────────────────────────────
+if (sessionStorage.getItem(SESSION_KEY)) loadAll();
+setInterval(() => { if (sessionStorage.getItem(SESSION_KEY)) loadAll(); }, 30000);
+</script>
+</body>
+</html>
