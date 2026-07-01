@@ -2,7 +2,7 @@
 
 NutriSnap is a full-stack web application that helps users make healthier, informed food choices by analyzing meals instantly from a photo. Users simply capture or upload an image of their meal and receive an accurate calorie estimate along with a complete nutrition breakdown.
 
-**🔗 Live Demo:** [nutrisnap.netlify.app](#)
+**🔗 Live Demo:** [https://spectacular-mousse-253b6d.netlify.app/]
 **💻 Repository:** [github.com/your-username/nutrisnap](#)
 
 ---
