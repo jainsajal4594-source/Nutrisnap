@@ -110,8 +110,5 @@ nutrisnap/
 - [ ] Personalized nutrition goals & recommendations
 - [ ] Integration with wearables (Fitbit, Apple Health)
 - [ ] Multi-language support
-
-## 🤝 Contributi
-
 ---
 Author:Sajal jain
